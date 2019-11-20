@@ -63,13 +63,9 @@ The project, based on Django Framework and Django Rest Framework library, provid
 ----
   The authentication token required. Returns an http status code.
 
-* **URL**
+* **URL** `/devices/:device_id/entries/`
 
-  `/devices/:device_id/entries/`
-
-* **Method:**
-
-  `POST`
+* **Method:** `POST`
   
 * **Data Params**
 
