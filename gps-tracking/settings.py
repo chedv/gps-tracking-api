@@ -20,22 +20,6 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DATETIME_INPUT_FORMATS': ['%m/%d/%Y %H:%M:%S'],
-    'DATETIME_FORMAT': '%m/%d/%Y %H:%M:%S',
-}
-
-AUTH_USER_MODEL = 'api.User'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -47,6 +31,22 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'gps-tracking.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 WSGI_APPLICATION = 'gps-tracking.wsgi.application'
 
@@ -81,3 +81,21 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DATETIME_INPUT_FORMATS': ['%m/%d/%Y %H:%M:%S'],
+    'DATETIME_FORMAT': '%m/%d/%Y %H:%M:%S',
+}
+
+AUTH_USER_MODEL = 'api.User'
