@@ -1,6 +1,6 @@
 # GPS tracking API
 
-The project, based on Django Framework and Django Rest Framework, provides API for GPS trackers to send location data to server and to read these data by their owners. Other features are under developing.
+The project, based on Django Framework and Django Rest Framework, provides API for GPS trackers to send location data to the server and to read these data by their owners.
 
 **User registration**
 ----
