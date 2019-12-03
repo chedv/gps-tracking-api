@@ -87,6 +87,10 @@ The project, based on Django Framework and Django Rest Framework, provides API f
 
 * **Method:** `GET`
 
+* **Data Params:**
+
+  `{ "datetime" : "mm/dd/YYYY HH:MM:SS" }`
+
 * **Success Response:**
 
   **Code:** `HTTP_200_OK`
