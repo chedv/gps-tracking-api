@@ -11,6 +11,9 @@ from django.contrib.auth import authenticate, get_user_model
 from .models import Device, Entry
 from .serializers import DeviceSerializer, EntrySerializer, UserSerializer
 
+from datetime import datetime
+import pytz
+
 
 class UserRegisterView(CreateAPIView):
     permission_classes = (AllowAny,)
@@ -39,7 +42,7 @@ class UserLogoutView(APIView):
 
 class DeviceView(APIView):
     def get(self, request):
-        devices = Device.objects.filter(owner=request.user).order_by('added')
+        devices = Device.objects.filter(owner=request.user).order_by('-added')
         serializer = DeviceSerializer(instance=devices, many=True)
         return Response({'devices': serializer.data})
 
@@ -78,8 +81,17 @@ class EntryView(APIView):
         serializer.save()
         return True
 
+    def create_datetime(self, str_dt):
+        obj_datetime = datetime.strptime(str_dt, '%m/%d/%Y %H:%M:%S')
+        return obj_datetime.replace(tzinfo=pytz.UTC)
+
     def get(self, request, device_id):
-        entries = Entry.objects.filter(device=device_id).order_by('datetime')
+        str_datetime = request.query_params.get('datetime')
+        entries = Entry.objects.filter(device=device_id)
+        if str_datetime is not None:
+            obj_datetime = self.create_datetime(str_datetime)
+            entries = entries.filter(device=device_id, datetime__gte=obj_datetime)
+        entries = entries.order_by('-datetime')
         serializer = EntrySerializer(instance=entries, many=True)
         return Response({'entries': serializer.data})
 
