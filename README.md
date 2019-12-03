@@ -30,7 +30,7 @@ The project, based on Django Framework and Django Rest Framework library, provid
 
 * **Method:** `POST`
   
-* **Data Params**
+* **Data Params:**
 
   `{ "email" : "example@mail.com", "password" : "12345678" }`
 
@@ -67,7 +67,7 @@ The project, based on Django Framework and Django Rest Framework library, provid
 
 * **Method:** `POST`
   
-* **Data Params**
+* **Data Params:**
 
   `{ "latitude" : xx.xxx, "longitude" : xx.xxx, "datetime" : "mm/dd/YYYY HH:MM:SS" }`
 
@@ -81,7 +81,7 @@ The project, based on Django Framework and Django Rest Framework library, provid
   
 **Get entries**
 ----
-  The authentication token required. Returns a json content.
+  The authentication token required. Receives a datetime string and returns a json content of entries list which datetime is greater than or equal of the received datetime. If the parameter wasn't passed, it returns a list of all records.
 
 * **URL** `/devices/:device_id/entries/`
 
