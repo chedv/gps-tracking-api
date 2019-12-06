@@ -11,8 +11,7 @@ from django.contrib.auth import authenticate, get_user_model
 from .models import Device, Entry
 from .serializers import DeviceSerializer, EntrySerializer, UserSerializer
 
-from datetime import datetime
-import pytz
+from api.utc_datetime import utc_datetime
 
 
 class UserRegisterView(CreateAPIView):
@@ -56,11 +55,12 @@ class EntryView(APIView):
     def device_exists(self, user):
         return Device.objects.filter(owner=user).exists()
 
-    def create_device(self, device_id, user):
+    def create_device(self, device_id, user_id):
+        devices_count = Device.objects.count() + 1
         device_data = {
             'id': device_id,
-            'name': 'new device',
-            'owner': user
+            'name': 'new device ' + str(devices_count),
+            'owner': user_id
         }
         serializer = DeviceSerializer(data=device_data)
         if not serializer.is_valid():
@@ -81,24 +81,20 @@ class EntryView(APIView):
         serializer.save()
         return True
 
-    def create_datetime(self, str_dt):
-        obj_datetime = datetime.strptime(str_dt, '%m/%d/%Y %H:%M:%S')
-        return obj_datetime.replace(tzinfo=pytz.UTC)
-
     def get(self, request, device_id):
         str_datetime = request.query_params.get('datetime')
         entries = Entry.objects.filter(device=device_id)
         if str_datetime is not None:
-            obj_datetime = self.create_datetime(str_datetime)
-            entries = entries.filter(device=device_id, datetime__gte=obj_datetime)
+            entries = entries.filter(device=device_id,
+                                     datetime__gte=utc_datetime(str_datetime))
         entries = entries.order_by('-datetime')
         serializer = EntrySerializer(instance=entries, many=True)
         return Response({'entries': serializer.data})
 
     def post(self, request, device_id):
-        user = request.user.id
-        if not self.device_exists(user):
-            if not self.create_device(device_id, user):
+        user_id = request.user.id
+        if not self.device_exists(user_id):
+            if not self.create_device(device_id, user_id):
                 return Response(status=HTTP_404_NOT_FOUND)
         if not self.create_entry(request, device_id):
             return Response(status=HTTP_404_NOT_FOUND)

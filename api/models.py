@@ -45,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Device(models.Model):
     id = models.CharField(max_length=16, primary_key=True)
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, unique=True)
     added = models.DateTimeField(auto_now_add=True, db_index=True)
     owner = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE)
 

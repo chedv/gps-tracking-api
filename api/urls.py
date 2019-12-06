@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 from .views import (UserRegisterView, UserLoginView, UserLogoutView,
                     DeviceView, EntryView)
 
@@ -8,5 +8,5 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('devices/', DeviceView.as_view(), name='devices'),
-    re_path(r'^devices/(?P<device_id>[0-9a-f]{16})/entries/$', EntryView.as_view(), name='entries')
+    path('devices/<str:device_id>/entries/', EntryView.as_view(), name='entries')
 ]

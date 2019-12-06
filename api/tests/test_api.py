@@ -31,7 +31,7 @@ class ApiTest(TestCase):
         self.entry_api.get(device_id, entry_data)
         device_data = {
             'id': device_id,
-            'name': 'new device'
+            'name': 'new device 1'
         }
         self.device_api.get(device_data)
         new_device_data = {
