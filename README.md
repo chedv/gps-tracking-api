@@ -1,6 +1,6 @@
 # GPS tracking API
 
-The project, based on Django Framework and Django Rest Framework library, provides API for GPS trackers to send location data to server and to read these data by their owners. Other features are under developing.
+The project, based on Django Framework and Django Rest Framework, provides API for GPS trackers to send location data to the server and to read these data by their owners.
 
 **User registration**
 ----
@@ -30,7 +30,7 @@ The project, based on Django Framework and Django Rest Framework library, provid
 
 * **Method:** `POST`
   
-* **Data Params**
+* **Data Params:**
 
   `{ "email" : "example@mail.com", "password" : "12345678" }`
 
@@ -67,7 +67,7 @@ The project, based on Django Framework and Django Rest Framework library, provid
 
 * **Method:** `POST`
   
-* **Data Params**
+* **Data Params:**
 
   `{ "latitude" : xx.xxx, "longitude" : xx.xxx, "datetime" : "mm/dd/YYYY HH:MM:SS" }`
 
@@ -81,11 +81,15 @@ The project, based on Django Framework and Django Rest Framework library, provid
   
 **Get entries**
 ----
-  The authentication token required. Returns a json content.
+  The authentication token required. Receives a datetime string and returns a json content of entries list which datetime is greater than or equal of the received datetime. If the parameter wasn't passed, it returns a list of all records.
 
 * **URL** `/devices/:device_id/entries/`
 
 * **Method:** `GET`
+
+* **Data Params:**
+
+  `{ "datetime" : "mm/dd/YYYY HH:MM:SS" }`
 
 * **Success Response:**
 
