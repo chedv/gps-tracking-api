@@ -2,16 +2,16 @@ from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_404_NOT_FOUND)
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND
 from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import authenticate, get_user_model
 
-from .models import Device, Entry
-from .serializers import DeviceSerializer, EntrySerializer, UserSerializer
+from .models import Device
+from .serializers import DeviceSerializer, UserSerializer
+from .services import DeviceService, EntryService
 
-from api.utc_datetime import utc_datetime
+import simplekml
 
 
 class UserRegisterView(CreateAPIView):
@@ -39,7 +39,7 @@ class UserLogoutView(APIView):
         return Response(status=HTTP_200_OK)
 
 
-class DeviceView(APIView):
+class DevicesView(APIView):
     def get(self, request):
         devices = Device.objects.filter(owner=request.user).order_by('-added')
         serializer = DeviceSerializer(instance=devices, many=True)
@@ -51,51 +51,38 @@ class DeviceView(APIView):
         return Response(status=HTTP_200_OK)
 
 
-class EntryView(APIView):
-    def device_exists(self, user):
-        return Device.objects.filter(owner=user).exists()
-
-    def create_device(self, device_id, user_id):
-        devices_count = Device.objects.count() + 1
-        device_data = {
-            'id': device_id,
-            'name': 'new device ' + str(devices_count),
-            'owner': user_id
-        }
-        serializer = DeviceSerializer(data=device_data)
-        if not serializer.is_valid():
-            return False
-        serializer.save()
-        return True
-
-    def create_entry(self, request, device_id):
-        entry_data = {
-            'latitude': request.data.get('latitude'),
-            'longitude': request.data.get('longitude'),
-            'datetime': request.data.get('datetime'),
-            'device': device_id
-        }
-        serializer = EntrySerializer(data=entry_data)
-        if not serializer.is_valid():
-            return False
-        serializer.save()
-        return True
+class EntriesView(APIView):
+    device_service = DeviceService()
+    entry_service = EntryService()
 
     def get(self, request, device_id):
         str_datetime = request.query_params.get('datetime')
-        entries = Entry.objects.filter(device=device_id)
-        if str_datetime is not None:
-            entries = entries.filter(device=device_id,
-                                     datetime__gte=utc_datetime(str_datetime))
-        entries = entries.order_by('-datetime')
-        serializer = EntrySerializer(instance=entries, many=True)
-        return Response({'entries': serializer.data})
+        entries = self.entry_service.get(device_id, str_datetime)
+        return Response({'entries': entries})
 
     def post(self, request, device_id):
         user_id = request.user.id
-        if not self.device_exists(user_id):
-            if not self.create_device(device_id, user_id):
+        if not self.device_service.exists(user_id):
+            if not self.device_service.create(device_id, user_id):
                 return Response(status=HTTP_404_NOT_FOUND)
-        if not self.create_entry(request, device_id):
+        if not self.entry_service.create(request, device_id):
             return Response(status=HTTP_404_NOT_FOUND)
         return Response(status=HTTP_201_CREATED)
+
+
+class EntriesExportView(APIView):
+    entry_service = EntryService()
+
+    def create_kml(self, entries):
+        kml = simplekml.Kml()
+        for entry in entries:
+            name = 'Point datetime: %s' % entry['datetime']
+            coord = (entry['latitude'], entry['longitude'])
+            kml.newpoint(name=name, coords=[coord])
+        return kml.kml()
+
+    def get(self, request, device_id):
+        str_datetime = request.query_params.get('datetime')
+        entries = self.entry_service.get(device_id, str_datetime)
+        kml = self.create_kml(entries)
+        return Response(data=kml, content_type='application/kml')

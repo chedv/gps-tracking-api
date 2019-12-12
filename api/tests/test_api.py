@@ -99,3 +99,45 @@ class ApiTest(TestCase):
 
         self.device_api.get_unauthorized({})
         self.device_api.put_unauthorized({})
+
+    def test_kml_export(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = '8765432187654321'
+        entries = [
+            {
+                'latitude': 52.278123,
+                'longitude': 47.163214,
+                'datetime': '12/15/2019 00:00:00'
+            },
+            {
+                'latitude': 51.678123,
+                'longitude': 47.563214,
+                'datetime': '12/16/2019 14:30:00'
+            },
+        ]
+        for entry in entries:
+            self.entry_api.post(device_id, entry)
+        url = '/devices/{}/entries/export/'.format(device_id)
+        data = {'datetime': '12/15/2019 00:00:00'}
+        response = self.client.get(path=url, data=data)
+        expected_kml = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">\n'
+            '    <Document id="feat_1">\n'
+            '        <Placemark id="feat_2">\n'
+            '            <name>Point datetime: 12/16/2019 14:30:00</name>\n'
+            '            <Point id="geom_0">\n'
+            '                <coordinates>51.678123,47.563214,0.0</coordinates>\n'
+            '            </Point>\n'
+            '        </Placemark>\n'
+            '        <Placemark id="feat_3">\n'
+            '            <name>Point datetime: 12/15/2019 00:00:00</name>\n'
+            '            <Point id="geom_1">\n'
+            '                <coordinates>52.278123,47.163214,0.0</coordinates>\n'
+            '            </Point>\n'
+            '        </Placemark>\n'
+            '    </Document>\n'
+            '</kml>\n')
+        self.assertEqual(response.data, expected_kml)
+        self.user_api.logout()
