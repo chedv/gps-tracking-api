@@ -75,10 +75,11 @@ class EntriesExportView(APIView):
 
     def create_kml(self, entries):
         kml = simplekml.Kml()
-        for entry in entries:
-            name = 'Point datetime: %s' % entry['datetime']
+        for i, entry in enumerate(entries):
+            name = 'Point #%d' % (i+1)
             coord = (entry['latitude'], entry['longitude'])
-            kml.newpoint(name=name, coords=[coord])
+            point = kml.newpoint(name=name, coords=[coord])
+            point.timestamp.when = entry['datetime']
         return kml.kml()
 
     def get(self, request, device_id):
