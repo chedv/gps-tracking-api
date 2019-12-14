@@ -1,42 +1,12 @@
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND
-from rest_framework.authtoken.models import Token
-
-from django.contrib.auth import authenticate, get_user_model
 
 from .models import Device
-from .serializers import DeviceSerializer, UserSerializer
+from .serializers import DeviceSerializer
 from .services import DeviceService, EntryService
 
 import simplekml
-
-
-class UserRegisterView(CreateAPIView):
-    permission_classes = (AllowAny,)
-    model = get_user_model()
-    serializer_class = UserSerializer
-
-
-class UserLoginView(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        user = authenticate(request=request, email=email, password=password)
-        if user is None:
-            return Response({'error': 'Invalid email or password'})
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
-
-
-class UserLogoutView(APIView):
-    def post(self, request):
-        request.user.auth_token.delete()
-        return Response(status=HTTP_200_OK)
 
 
 class DevicesView(APIView):
