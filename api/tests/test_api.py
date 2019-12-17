@@ -100,7 +100,12 @@ class ApiTest(TestCase):
         self.device_api.get_unauthorized({})
         self.device_api.put_unauthorized({})
 
-    def test_kml_export(self):
+    def test_export(self):
+        def entries_export(to_format, params, expected):
+            url = '/devices/{0}/entries/export/{1}/'.format(*to_format)
+            response = self.client.get(path=url, data=params).data
+            self.assertEqual(response, expected)
+
         self.user_api.register()
         self.user_api.login()
         device_id = '8765432187654321'
@@ -118,9 +123,7 @@ class ApiTest(TestCase):
         ]
         for entry in entries:
             self.entry_api.post(device_id, entry)
-        url = '/devices/{}/entries/export/'.format(device_id)
         data = {'datetime': '12/15/2019 00:00:00'}
-        response = self.client.get(path=url, data=data)
         expected_kml = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">\n'
@@ -144,6 +147,29 @@ class ApiTest(TestCase):
             '            </Point>\n'
             '        </Placemark>\n'
             '    </Document>\n'
-            '</kml>\n')
-        self.assertEqual(response.data, expected_kml)
+            '</kml>\n'
+        )
+        expected_gpx = (
+            "<?xml version='1.0' encoding='utf-8'?>\n"
+            '<gpx>\n'
+            '  <trk>\n'
+            '    <name>Point #1</name>\n'
+            '    <trkseg>\n'
+            '      <trkpt lat="51.678123" lon="47.563214">\n'
+            '        <time>12/16/2019 14:30:00</time>\n'
+            '      </trkpt>\n'
+            '    </trkseg>\n'
+            '  </trk>\n'
+            '  <trk>\n'
+            '    <name>Point #2</name>\n'
+            '    <trkseg>\n'
+            '      <trkpt lat="52.278123" lon="47.163214">\n'
+            '        <time>12/15/2019 00:00:00</time>\n'
+            '      </trkpt>\n'
+            '    </trkseg>\n'
+            '  </trk>\n'
+            '</gpx>\n'
+        )
+        entries_export((device_id, 'kml'), data, expected_kml)
+        entries_export((device_id, 'gpx'), data, expected_gpx)
         self.user_api.logout()

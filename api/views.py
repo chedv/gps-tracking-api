@@ -6,6 +6,8 @@ from .models import Device
 from .serializers import DeviceSerializer
 from .services import DeviceService, EntryService
 
+from .gpx import Gpx, GpxTrack, GpxTrackSegment
+
 import simplekml
 
 
@@ -43,7 +45,7 @@ class EntriesView(APIView):
 class EntriesExportView(APIView):
     entry_service = EntryService()
 
-    def create_kml(self, entries):
+    def kml(self, entries):
         kml = simplekml.Kml()
         for i, entry in enumerate(entries):
             name = 'Point #%d' % (i+1)
@@ -52,8 +54,23 @@ class EntriesExportView(APIView):
             point.timestamp.when = entry['datetime']
         return kml.kml()
 
-    def get(self, request, device_id):
+    def gpx(self, entries):
+        gpx = Gpx()
+        for i, entry in enumerate(entries):
+            name = 'Point #%d' % (i+1)
+            track = GpxTrack(name=name)
+            track_segment = GpxTrackSegment()
+            track_segment.point(entry['latitude'], entry['longitude'], entry['datetime'])
+            track.segment(track_segment)
+            gpx.track(track)
+        return gpx.xml()
+
+    def get(self, request, device_id, export):
         str_datetime = request.query_params.get('datetime')
         entries = self.entry_service.get(device_id, str_datetime)
-        kml = self.create_kml(entries)
-        return Response(data=kml, content_type='application/kml')
+        formats = {'kml': self.kml, 'gpx': self.gpx}
+        try:
+            create = formats[export]
+            return Response(data=create(entries), content_type='application/%s' % export)
+        except KeyError:
+            return Response(status=HTTP_404_NOT_FOUND)
