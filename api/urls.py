@@ -1,6 +1,6 @@
 from django.urls import path
 from .user_auth import UserRegisterView, UserLoginView, UserLogoutView
-from .views import DevicesView, EntriesView, EntriesExportView
+from .views import DevicesView, EntriesView
 
 
 urlpatterns = [
@@ -8,7 +8,5 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('devices/', DevicesView.as_view(), name='devices'),
-    path('devices/<str:device_id>/entries/', EntriesView.as_view(), name='entries'),
-    path('devices/<str:device_id>/entries/export/<str:export>/',
-         EntriesExportView.as_view(), name='entries-export')
+    path('devices/<str:device_id>/entries', EntriesView.as_view(), name='entries'),
 ]

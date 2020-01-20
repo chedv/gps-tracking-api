@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from rest_framework.test import APIClient
 from rest_framework.status import (HTTP_201_CREATED, HTTP_200_OK,
                                    HTTP_401_UNAUTHORIZED)
 
@@ -10,31 +9,39 @@ class ApiEntryTest(TestCase):
         super().__init__()
         self.client = client
 
-    def post(self, id, data):
-        return self._send(APIClient.post, HTTP_201_CREATED, id, data)
+    def post(self, device_id, data):
+        return self._post(HTTP_201_CREATED, device_id, data)
 
-    def post_unauthorized(self, id, data):
-        return self._send(APIClient.post, HTTP_401_UNAUTHORIZED, id, data)
+    def post_unauthorized(self, device_id, data):
+        return self._post(HTTP_401_UNAUTHORIZED, device_id, data)
 
-    def get(self, id, data, str_datetime=None):
-        if str_datetime is None:
-            send = {}
-        else:
-            send = {'datetime': str_datetime}
-        response = self._send(APIClient.get, HTTP_200_OK, id, send)
-        self.assertIn('entries', response)
-        self.assertIn(data, response['entries'])
+    def get(self, device_id, params, expected):
+        response = self._get(HTTP_200_OK, device_id, params)
+        self.assertIn(expected, response)
         return response
 
-    def get_by_datetime(self, id, expected_list, str_datetime):
+    def get_by_datetime(self, device_id, str_datetime, expected_list):
+        params = {'datetime': str_datetime}
         for expected in expected_list:
-            self.get(id, expected, str_datetime)
+            self.get(device_id, params, expected)
 
-    def get_unauthorized(self, id, data):
-        return self._send(APIClient.get, HTTP_401_UNAUTHORIZED, id, data)
+    def get_by_type(self, device_id, export_type, str_datetime, expected):
+        params = {'type': export_type, 'datetime': str_datetime}
+        response = self._get(HTTP_200_OK, device_id, params)
+        self.assertEqual(expected, response)
 
-    def _send(self, method, code, id, data):
-        url = '/devices/{}/entries/'.format(id)
-        response = method(self.client, path=url, data=data)
-        self.assertEqual(response.status_code, code)
+    def get_unauthorized(self, device_id, data):
+        return self._get(HTTP_401_UNAUTHORIZED, device_id, data)
+
+    def _get(self, expected_code, device_id, params):
+        url_params = [f'{key}={value}' for key, value in params.items()]
+        url = f'/devices/{device_id}/entries?' + '&&'.join(url_params)
+        response = self.client.get(path=url)
+        self.assertEqual(expected_code, response.status_code)
+        return response.data
+
+    def _post(self, expected_code, device_id, data):
+        url = f'/devices/{device_id}/entries'
+        response = self.client.post(path=url, data=data)
+        self.assertEqual(expected_code, response.status_code)
         return response.data

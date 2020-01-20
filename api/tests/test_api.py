@@ -28,7 +28,7 @@ class ApiTest(TestCase):
             'datetime': '12/25/2019 14:00:00'
         }
         self.entry_api.post(device_id, entry_data)
-        self.entry_api.get(device_id, entry_data)
+        self.entry_api.get(device_id, {}, entry_data)
         device_data = {
             'id': device_id,
             'name': 'new device 1'
@@ -75,12 +75,12 @@ class ApiTest(TestCase):
         ]
         for entry in entries:
             self.entry_api.post(device_id, entry)
-            self.entry_api.get(device_id, entry)
-        self.entry_api.get_by_datetime(device_id, entries[1:], '12/25/2019 10:25:00')
-        self.entry_api.get_by_datetime(device_id, entries[3:], '12/25/2019 11:05:00')
-        self.entry_api.get_by_datetime(device_id, entries, '12/25/2019 09:30:00')
-        self.entry_api.get_by_datetime(device_id, entries[5:], '12/26/2019 08:00:00')
-        self.entry_api.get_by_datetime(device_id, [], '12/27/2019 06:00:00')
+            self.entry_api.get(device_id, {}, entry)
+        self.entry_api.get_by_datetime(device_id, '12/25/2019 10:25:00', entries[1:])
+        self.entry_api.get_by_datetime(device_id, '12/25/2019 11:05:00', entries[3:])
+        self.entry_api.get_by_datetime(device_id, '12/25/2019 09:30:00', entries)
+        self.entry_api.get_by_datetime(device_id, '12/26/2019 08:00:00', entries[5:])
+        self.entry_api.get_by_datetime(device_id, '12/27/2019 06:00:00', [])
         self.user_api.logout()
 
     def test_unauthorized(self):
@@ -101,11 +101,6 @@ class ApiTest(TestCase):
         self.device_api.put_unauthorized({})
 
     def test_export(self):
-        def entries_export(to_format, params, expected):
-            url = '/devices/{0}/entries/export/{1}/'.format(*to_format)
-            response = self.client.get(path=url, data=params).data
-            self.assertEqual(response, expected)
-
         self.user_api.register()
         self.user_api.login()
         device_id = '8765432187654321'
@@ -123,7 +118,6 @@ class ApiTest(TestCase):
         ]
         for entry in entries:
             self.entry_api.post(device_id, entry)
-        data = {'datetime': '12/15/2019 00:00:00'}
         expected_kml = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">\n'
@@ -170,6 +164,7 @@ class ApiTest(TestCase):
             '  </trk>\n'
             '</gpx>\n'
         )
-        entries_export((device_id, 'kml'), data, expected_kml)
-        entries_export((device_id, 'gpx'), data, expected_gpx)
+        datetime = '12/15/2019 00:00:00'
+        self.entry_api.get_by_type(device_id, 'kml', datetime, expected_kml)
+        self.entry_api.get_by_type(device_id, 'gpx', datetime, expected_gpx)
         self.user_api.logout()
