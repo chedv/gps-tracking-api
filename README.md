@@ -81,9 +81,9 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
 **Get entries**
 ----
-  The authentication token required. Receives a datetime string and returns a json content of entries list which datetime is greater than or equal of the received datetime. If the parameter wasn't passed, it returns a list of all records.
+  The authentication token required. Receives a type of the returned data and a datetime string. Returns a json content of entries list which datetime is greater than or equal of the received datetime. If the parameter wasn't passed, it returns a list of all records.
 
-* **URL** `/devices/:device_id/entries/`
+* **URL** `/devices/:device_id/entries`
 
 * **Method:** `GET`
 
@@ -94,7 +94,8 @@ The project, based on Django Framework and Django Rest Framework, provides API f
 * **Success Response:**
 
   **Code:** `HTTP_200_OK`
-  **Content:** 
+  
+  **JSON:**
   
   ```
   { 
@@ -107,6 +108,42 @@ The project, based on Django Framework and Django Rest Framework, provides API f
       ]
   }
   ```
+  
+  **KML:**
+  
+  ```
+  <?xml version="1.0" encoding="UTF-8"?>
+  <kml xmlns="http://earth.google.com/kml/2.1">
+    <Document id="feat_1">
+      <Placemark id="feat_2">
+        <name>Point #1</name>
+        <TimeStamp id="time_0">
+          <when>mm/dd/YYYY HH:MM:SS</when>
+        </TimeStamp>
+        <Point id="geom_0">
+          <coordinates>xx.xxxxxx,xx.xxxxxx,0.0</coordinates>
+        </Point>
+      </Placemark>
+     </Document>
+  </kml>
+  ```
+  
+  **GPX:**
+  
+  ```
+  <?xml version="1.0" encoding="UTF-8"?>
+  <gpx>
+    <trk>
+      <name>Point #1</name>
+      <trkseg>
+        <trkpt lat="xx.xxxxxx" lon="xx.xxxxxx">
+          <time>mm/dd/YYYY HH:MM:SS</time>
+        </trkpt>
+      </trkseg>
+    </trk>
+  </gpx>
+  ```
+  
  
 * **Error Response:**
 
