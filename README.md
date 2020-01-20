@@ -101,8 +101,8 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   { 
       "entries" : [ 
           { 
-              "latitude" : xx.xxx, 
-              "longitude" : xx.xxx, 
+              "latitude" : xx.xxxxxx, 
+              "longitude" : xx.xxxxxx, 
               "datetime" : "mm/dd/YYYY HH:MM:SS" 
           }, 
       ]
