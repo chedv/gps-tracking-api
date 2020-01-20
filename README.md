@@ -69,7 +69,13 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
 * **Data Params:**
 
-  `{ "latitude" : xx.xxx, "longitude" : xx.xxx, "datetime" : "mm/dd/YYYY HH:MM:SS" }`
+  ```
+  { 
+      "latitude" : xx.xxxxxx, 
+      "longitude" : xx.xxxxxx, 
+      "datetime" : "mm/dd/YYYY HH:MM:SS" 
+  }
+  ```
 
 * **Success Response:**
 
