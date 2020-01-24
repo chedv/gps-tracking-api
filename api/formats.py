@@ -2,15 +2,8 @@ from .gpx import Gpx, GpxTrack, GpxTrackSegment
 import simplekml
 
 
-class Exporter:
-    def export(self, entries, export_type=None):
-        formats = {'kml': self._get_kml, 'gpx': self._get_gpx}
-        if export_type is None:
-            return entries
-        get = formats[export_type]
-        return get(entries)
-
-    def _get_kml(self, entries):
+class KmlFormat:
+    def format(self, entries):
         kml = simplekml.Kml()
         for i, entry in enumerate(entries):
             name = 'Point #%d' % (i+1)
@@ -19,7 +12,9 @@ class Exporter:
             point.timestamp.when = entry['datetime']
         return kml.kml()
 
-    def _get_gpx(self, entries):
+
+class GpxFormat:
+    def format(self, entries):
         gpx = Gpx()
         for i, entry in enumerate(entries):
             name = 'Point #%d' % (i+1)

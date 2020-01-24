@@ -2,9 +2,9 @@ from django.test import TestCase
 
 from rest_framework.test import APIClient
 
-from .test_user import ApiUserTest
-from .test_entry import ApiEntryTest
-from .test_device import ApiDeviceTest
+from api.tests.test_user import ApiUserTest
+from api.tests.test_entry import ApiEntryTest
+from api.tests.test_device import ApiDeviceTest
 
 
 class ApiTest(TestCase):
@@ -73,9 +73,10 @@ class ApiTest(TestCase):
                 'datetime': '12/26/2019 16:00:00'
             },
         ]
+        data = {}
         for entry in entries:
             self.entry_api.post(device_id, entry)
-            self.entry_api.get(device_id, {}, entry)
+            self.entry_api.get(device_id, data, entry)
         self.entry_api.get_by_datetime(device_id, '12/25/2019 10:25:00', entries[1:])
         self.entry_api.get_by_datetime(device_id, '12/25/2019 11:05:00', entries[3:])
         self.entry_api.get_by_datetime(device_id, '12/25/2019 09:30:00', entries)
@@ -164,7 +165,54 @@ class ApiTest(TestCase):
             '  </trk>\n'
             '</gpx>\n'
         )
-        datetime = '12/15/2019 00:00:00'
-        self.entry_api.get_by_type(device_id, 'kml', datetime, expected_kml)
-        self.entry_api.get_by_type(device_id, 'gpx', datetime, expected_gpx)
+        str_datetime = '12/15/2019 00:00:00'
+        self.entry_api.get_by_type(device_id, 'kml', str_datetime, expected_kml)
+        self.entry_api.get_by_type(device_id, 'gpx', str_datetime, expected_gpx)
+        self.user_api.logout()
+
+    def test_nmea_entries(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = 'abcdef123456abcd'
+        entries = [
+            '$GPRMC,125504.049,A,5542.2389,N,03741.6063,E,0.19,25.82,200919,,,*17',
+            '$GNRMC,033615.00,A,3157.10477,S,11549.42965,E,0.120,,270115,,,A*73',
+            '$GPRMC,164125,A,4425.8988,N,07543.5370,W,000.0,000.0,151116,,,A*66',
+        ]
+        for entry in entries:
+            self.entry_api.post(device_id, entry, 'nmea')
+        expected_entries = [
+            {
+                'latitude': 55.703982,
+                'longitude': 37.693438,
+                'datetime': '09/20/2019 12:55:04'
+            },
+            {
+                'latitude': -31.951746,
+                'longitude': 115.823827,
+                'datetime': '01/27/2015 03:36:15'
+            },
+            {
+                'latitude': 44.431647,
+                'longitude': -75.725617,
+                'datetime': '11/15/2016 16:41:25'
+            },
+        ]
+        data = {}
+        for expected_entry in expected_entries:
+            self.entry_api.get(device_id, data, expected_entry)
+        self.user_api.logout()
+
+    def test_nmea_invalid(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = 'abcdef123456abcd'
+        entries = [
+            '$GPRMC,,V,,,,,,,080907,9.6,E,N*31',
+            '$GPRMC,,V,,,,,,,,,,N*53',
+            '$GPRMC,121738.086,V,,,,,0.00,0.00,290316,,,N*42',
+        ]
+        for entry in entries:
+            args = (device_id, entry, 'nmea')
+            self.assertRaises(ValueError, self.entry_api.post, *args)
         self.user_api.logout()

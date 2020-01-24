@@ -28,11 +28,11 @@ class DeviceService(Service):
 
 
 class EntryService(Service):
-    def create(self, request, device_id):
+    def create(self, data, device_id):
         entry_data = {
-            'latitude': request.data.get('latitude'),
-            'longitude': request.data.get('longitude'),
-            'datetime': request.data.get('datetime'),
+            'latitude': data.get('latitude'),
+            'longitude': data.get('longitude'),
+            'datetime': data.get('datetime'),
             'device': device_id
         }
         serializer = EntrySerializer(data=entry_data)

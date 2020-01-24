@@ -1,11 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND
+from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.renderers import JSONRenderer, MultiPartRenderer
 
-from .models import Device
-from .serializers import DeviceSerializer
-from .services import DeviceService, EntryService
-from .exporter import Exporter
+from api.models import Device
+from api.serializers import DeviceSerializer
+from api.services import DeviceService, EntryService
+from api.formats import KmlFormat, GpxFormat
+from api.parsers import NmeaParser
 
 
 class DevicesView(APIView):
@@ -21,24 +24,29 @@ class DevicesView(APIView):
 
 
 class EntriesView(APIView):
+    parser_classes = (JSONParser, MultiPartParser, NmeaParser)
+    renderer_classes = (JSONRenderer, MultiPartRenderer)
+
+    formats = dict(kml=KmlFormat(), gpx=GpxFormat())
+
     device_service = DeviceService()
     entry_service = EntryService()
 
     def get(self, request, device_id):
-        export_type = request.query_params.get('type')
+        response_format = request.query_params.get('accept-type')
         str_datetime = request.query_params.get('datetime')
         entries = self.entry_service.get(device_id, str_datetime)
-        try:
-            result = Exporter().export(entries, export_type)
-            return Response(data=result, content_type='application/%s' % export_type)
-        except KeyError:
-            return Response(status=HTTP_404_NOT_FOUND)
+        if response_format not in self.formats:
+            return Response(data=entries)
+        selected = self.formats[response_format]
+        content_type = f'application/{response_format}'
+        return Response(selected.format(entries), content_type=content_type)
 
     def post(self, request, device_id):
         user_id = request.user.id
         if not self.device_service.exists(user_id):
             if not self.device_service.create(device_id, user_id):
                 return Response(status=HTTP_404_NOT_FOUND)
-        if not self.entry_service.create(request, device_id):
+        if not self.entry_service.create(request.data, device_id):
             return Response(status=HTTP_404_NOT_FOUND)
         return Response(status=HTTP_201_CREATED)
