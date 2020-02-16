@@ -128,14 +128,15 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   ```
   <?xml version="1.0" encoding="utf-8"?>
   <kml xmlns="http://earth.google.com/kml/2.1">
-      <Document id="feat_1">
-          <Placemark id="feat_2">
+      <Document>
+          <name>entries</name>
+          <Placemark>
               <name>Point #1</name>
-              <TimeStamp id="time_0">
+              <TimeStamp>
                   <when>mm/dd/YYYY HH:MM:SS</when>
               </TimeStamp>
-              <Point id="geom_0">
-                  <coordinates>xx.xxxxxx,xx.xxxxxx,0.0</coordinates>
+              <Point>
+                  <coordinates>xx.xxxxxx,xx.xxxxxx</coordinates>
               </Point>
           </Placemark>
       </Document>
@@ -147,14 +148,11 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   ```
   <?xml version="1.0" encoding="utf-8"?>
   <gpx>
-      <trk>
+      <name>entries</name>
+      <wpt lat="xx.xxxxxx" lon="xx.xxxxxx">
+          <time>mm/dd/YYYY HH:MM:SS</time>
           <name>Point #1</name>
-          <trkseg>
-              <trkpt lat="xx.xxxxxx" lon="xx.xxxxxx">
-                  <time>mm/dd/YYYY HH:MM:SS</time>
-              </trkpt>
-          </trkseg>
-      </trk>
+      </wpt>
   </gpx>
   ```
   
