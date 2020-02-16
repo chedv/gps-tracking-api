@@ -127,7 +127,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
   ```
   <?xml version="1.0" encoding="utf-8"?>
-  <kml xmlns="http://earth.google.com/kml/2.1">
+  <kml xmlns="http://www.opengis.net/kml/2.2">
       <Document>
           <name>entries</name>
           <Placemark>
@@ -147,7 +147,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
   ```
   <?xml version="1.0" encoding="utf-8"?>
-  <gpx>
+  <gpx xmlns="http://www.topografix.com/GPX/1/1">
       <name>entries</name>
       <wpt lat="xx.xxxxxx" lon="xx.xxxxxx">
           <time>mm/dd/YYYY HH:MM:SS</time>
