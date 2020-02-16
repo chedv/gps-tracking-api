@@ -43,5 +43,5 @@ class EntryService(Service):
         if str_datetime is not None:
             datetime = utc_datetime(str_datetime)
             entries = entries.filter(device=device_id, datetime__gte=datetime)
-        serializer = EntrySerializer(instance=entries.order_by('-datetime'), many=True)
+        serializer = EntrySerializer(instance=entries.order_by('datetime'), many=True)
         return serializer.data

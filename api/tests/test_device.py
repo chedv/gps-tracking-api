@@ -25,6 +25,6 @@ class ApiDeviceTest(TestCase):
         return self._send(APIClient.put, data, HTTP_401_UNAUTHORIZED)
 
     def _send(self, method, data, code):
-        response = method(self.client, path='/devices/', data=data)
+        response = method(self.client, path='/devices', data=data)
         self.assertEqual(response.status_code, code)
         return response.data

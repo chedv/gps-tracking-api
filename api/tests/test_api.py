@@ -84,7 +84,7 @@ class ApiTest(TestCase):
         self.entry_api.get_by_datetime(device_id, '12/27/2019 06:00:00', [])
         self.user_api.logout()
 
-    def test_unauthorized(self):
+    def test_unauthorized_case(self):
         self.user_api.register()
         self.user_api.login()
         self.user_api.logout()
@@ -101,7 +101,7 @@ class ApiTest(TestCase):
         self.device_api.get_unauthorized({})
         self.device_api.put_unauthorized({})
 
-    def test_export(self):
+    def test_formats(self):
         self.user_api.register()
         self.user_api.login()
         device_id = '8765432187654321'
@@ -120,52 +120,61 @@ class ApiTest(TestCase):
         for entry in entries:
             self.entry_api.post(device_id, entry)
         expected_kml = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">\n'
-            '    <Document id="feat_1">\n'
-            '        <Placemark id="feat_2">\n'
-            '            <name>Point #1</name>\n'
-            '            <TimeStamp id="time_0">\n'
-            '                <when>12/16/2019 14:30:00</when>\n'
-            '            </TimeStamp>\n'
-            '            <Point id="geom_0">\n'
-            '                <coordinates>51.678123,47.563214,0.0</coordinates>\n'
-            '            </Point>\n'
-            '        </Placemark>\n'
-            '        <Placemark id="feat_3">\n'
-            '            <name>Point #2</name>\n'
-            '            <TimeStamp id="time_1">\n'
-            '                <when>12/15/2019 00:00:00</when>\n'
-            '            </TimeStamp>\n'
-            '            <Point id="geom_1">\n'
-            '                <coordinates>52.278123,47.163214,0.0</coordinates>\n'
-            '            </Point>\n'
-            '        </Placemark>\n'
-            '    </Document>\n'
-            '</kml>\n'
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<kml xmlns="http://www.opengis.net/kml/2.2">'
+            '<Document>'
+            '<name>entries</name>'
+            '<Placemark>'
+            '<name>Point #1</name>'
+            '<TimeStamp><when>12/15/2019 00:00:00</when></TimeStamp>'
+            '<Point><coordinates>47.163214,52.278123</coordinates></Point>'
+            '</Placemark>'
+            '<Placemark>'
+            '<name>Point #2</name>'
+            '<TimeStamp><when>12/16/2019 14:30:00</when></TimeStamp>'
+            '<Point><coordinates>47.563214,51.678123</coordinates></Point>'
+            '</Placemark>'
+            '</Document>'
+            '</kml>'
         )
         expected_gpx = (
-            "<?xml version='1.0' encoding='utf-8'?>\n"
-            '<gpx>\n'
-            '  <trk>\n'
-            '    <name>Point #1</name>\n'
-            '    <trkseg>\n'
-            '      <trkpt lat="51.678123" lon="47.563214">\n'
-            '        <time>12/16/2019 14:30:00</time>\n'
-            '      </trkpt>\n'
-            '    </trkseg>\n'
-            '  </trk>\n'
-            '  <trk>\n'
-            '    <name>Point #2</name>\n'
-            '    <trkseg>\n'
-            '      <trkpt lat="52.278123" lon="47.163214">\n'
-            '        <time>12/15/2019 00:00:00</time>\n'
-            '      </trkpt>\n'
-            '    </trkseg>\n'
-            '  </trk>\n'
-            '</gpx>\n'
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<gpx xmlns="http://www.topografix.com/GPX/1/1">'
+            '<name>entries</name>'
+            '<wpt lat="52.278123" lon="47.163214">'
+            '<time>12/15/2019 00:00:00</time>'
+            '<name>Point #1</name>'
+            '</wpt>'
+            '<wpt lat="51.678123" lon="47.563214">'
+            '<time>12/16/2019 14:30:00</time>'
+            '<name>Point #2</name>'
+            '</wpt>'
+            '</gpx>'
         )
         str_datetime = '12/15/2019 00:00:00'
+        self.entry_api.get_by_type(device_id, 'kml', str_datetime, expected_kml)
+        self.entry_api.get_by_type(device_id, 'gpx', str_datetime, expected_gpx)
+        self.user_api.logout()
+
+    def test_formats_empty_case(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = '8765432187654321'
+        expected_kml = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<kml xmlns="http://www.opengis.net/kml/2.2">'
+            '<Document>'
+            '<name>entries</name>'
+            '</Document>'
+            '</kml>'
+        )
+        expected_gpx = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<gpx xmlns="http://www.topografix.com/GPX/1/1">'
+            '<name>entries</name>'
+            '</gpx>'
+        )
+        str_datetime = '01/25/2020 00:00:00'
         self.entry_api.get_by_type(device_id, 'kml', str_datetime, expected_kml)
         self.entry_api.get_by_type(device_id, 'gpx', str_datetime, expected_gpx)
         self.user_api.logout()
@@ -203,7 +212,7 @@ class ApiTest(TestCase):
             self.entry_api.get(device_id, data, expected_entry)
         self.user_api.logout()
 
-    def test_nmea_invalid(self):
+    def test_nmea_invalid_case(self):
         self.user_api.register()
         self.user_api.login()
         device_id = 'abcdef123456abcd'

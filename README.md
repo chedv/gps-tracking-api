@@ -1,59 +1,63 @@
 # GPS tracking API
 
-The project, based on Django Framework and Django Rest Framework, provides API for GPS trackers to send location data to the server and to read these data by their owners.
+The project, based on Django Framework and Django Rest Framework, provides API for GPS trackers to send location data to the server and to retrieve these data by their owners using JSON, KML and GPX formats.
 
 **User registration**
 ----
   Returns an http status code.
 
-* **URL:** `/register/`
+* **URL:** `/register`
 
 * **Method:** `POST`
   
 * **Data Params:**
 
+  Supported JSON format:
+
   `{ "email" : "example@mail.com", "password" : "12345678" }`
 
 * **Success Response:**
 
-  **Code:** `HTTP_201_CREATED`
+  **Code:** `HTTP 201 CREATED`
  
 * **Error Response:**
 
-  **Code:** `HTTP_404_NOT_FOUND`
+  **Code:** `HTTP 404 NOT FOUND`
 
 **User login**
 ----
   Returns an authentication token.
 
-* **URL:** `/login/`
+* **URL:** `/login`
 
 * **Method:** `POST`
   
 * **Data Params:**
 
+  Supported JSON format:
+
   `{ "email" : "example@mail.com", "password" : "12345678" }`
 
 * **Success Response:**
 
-  * **Code:** `HTTP_200_OK`<br />
+  * **Code:** `HTTP 200 OK`<br />
   * **Content:** `{ "token" : "012b3cf390fcd04aa9df503e3d08c23054f7fd90" }`
  
 * **Error Response:**
 
-  **Code:** `HTTP_404_NOT_FOUND`
+  **Code:** `HTTP 404 NOT FOUND`
 
 **User logout**
 ----
-  The authentication token required. Returns an http status code.
+  The authentication token is required. Returns an http status code.
 
-* **URL:** `/logout/`
+* **URL:** `/logout`
 
 * **Method:** `POST`
   
 * **Success Response:**
 
-  **Code:** `HTTP_200_OK`
+  **Code:** `HTTP 200 OK`
  
 * **Error Response:**
 
@@ -61,13 +65,15 @@ The project, based on Django Framework and Django Rest Framework, provides API f
 
 **Send entry**
 ----
-  The authentication token required. Returns an http status code.
+  The authentication token is required. Returns an http status code.
 
-* **URL** `/devices/:device_id/entries/`
+* **URL:** `/devices/:device_id/entries`
 
 * **Method:** `POST`
   
 * **Data Params:**
+
+  **JSON**
 
   ```
   { 
@@ -76,10 +82,16 @@ The project, based on Django Framework and Django Rest Framework, provides API f
       "datetime" : "mm/dd/YYYY HH:MM:SS" 
   }
   ```
+  
+  **NMEA**
+  
+  ```
+  $GPRMC,125504.049,A,5542.2389,N,03741.6063,E,0.19,25.82,200919,,,*17
+  ```
 
 * **Success Response:**
 
-  **Code:** `HTTP_201_CREATED`
+  **Code:** `HTTP 201 CREATED`
  
 * **Error Response:**
 
@@ -87,21 +99,17 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
 **Get entries**
 ----
-  The authentication token required. Receives a type of the returned data and a datetime string. Returns a json content of entries list which datetime is greater than or equal of the received datetime. If the parameter wasn't passed, it returns a list of all records.
+  The authentication token is required. Receives `accept-type` and `datetime` parameters. Returns collected entries. If the parameter `datetime` wasn't passed, the response contains all of the records.
 
-* **URL** `/devices/:device_id/entries`
+* **URL:** `/devices/:device_id/entries`
 
 * **Method:** `GET`
 
-* **Data Params:**
-
-  `{ "datetime" : "mm/dd/YYYY HH:MM:SS" }`
-
 * **Success Response:**
 
-  **Code:** `HTTP_200_OK`
+  **Code:** `HTTP 200 OK`
   
-  **JSON:**
+  **JSON**
   
   ```
   { 
@@ -115,38 +123,38 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   }
   ```
   
-  **KML:**
+  **KML**
   
   ```
-  <?xml version="1.0" encoding="UTF-8"?>
+  <?xml version="1.0" encoding="utf-8"?>
   <kml xmlns="http://earth.google.com/kml/2.1">
-    <Document id="feat_1">
-      <Placemark id="feat_2">
-        <name>Point #1</name>
-        <TimeStamp id="time_0">
-          <when>mm/dd/YYYY HH:MM:SS</when>
-        </TimeStamp>
-        <Point id="geom_0">
-          <coordinates>xx.xxxxxx,xx.xxxxxx,0.0</coordinates>
-        </Point>
-      </Placemark>
-     </Document>
+      <Document id="feat_1">
+          <Placemark id="feat_2">
+              <name>Point #1</name>
+              <TimeStamp id="time_0">
+                  <when>mm/dd/YYYY HH:MM:SS</when>
+              </TimeStamp>
+              <Point id="geom_0">
+                  <coordinates>xx.xxxxxx,xx.xxxxxx,0.0</coordinates>
+              </Point>
+          </Placemark>
+      </Document>
   </kml>
   ```
   
-  **GPX:**
+  **GPX**
   
   ```
-  <?xml version="1.0" encoding="UTF-8"?>
+  <?xml version="1.0" encoding="utf-8"?>
   <gpx>
-    <trk>
-      <name>Point #1</name>
-      <trkseg>
-        <trkpt lat="xx.xxxxxx" lon="xx.xxxxxx">
-          <time>mm/dd/YYYY HH:MM:SS</time>
-        </trkpt>
-      </trkseg>
-    </trk>
+      <trk>
+          <name>Point #1</name>
+          <trkseg>
+              <trkpt lat="xx.xxxxxx" lon="xx.xxxxxx">
+                  <time>mm/dd/YYYY HH:MM:SS</time>
+              </trkpt>
+          </trkseg>
+      </trk>
   </gpx>
   ```
   
@@ -157,15 +165,16 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   
 **Get devices**
 ----
-  The authentication token required. Returns a json content.
+  The authentication token is required. Returns all added devices using JSON format.
 
-* **URL** `/devices/`
+* **URL:** `/devices/`
 
 * **Method:** `GET`
 
 * **Success Response:**
 
-  **Code:** `HTTP_200_OK`
+  **Code:** `HTTP 200 OK`
+  
   **Content:** 
   
   ```
@@ -181,4 +190,4 @@ The project, based on Django Framework and Django Rest Framework, provides API f
  
 * **Error Response:**
 
-  **Content:** `{ "detail" : "Authentication credentials were not provided." }`
+  **JSON Content:** `{ "detail" : "Authentication credentials were not provided." }`

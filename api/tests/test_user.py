@@ -10,12 +10,12 @@ class ApiUserTest(TestCase):
         self.user_data = user_data
 
     def register(self):
-        response = self.client.post(path='/register/', data=self.user_data)
+        response = self.client.post(path='/register', data=self.user_data)
         self.assertEqual(response.status_code, HTTP_201_CREATED)
         return response.data
 
     def login(self):
-        response = self.client.post(path='/login/', data=self.user_data)
+        response = self.client.post(path='/login', data=self.user_data)
         self.assertEqual(response.status_code, HTTP_200_OK)
         self.assertIn('token', response.data)
         token_auth = 'Token {}'.format(response.data['token'])
@@ -23,6 +23,6 @@ class ApiUserTest(TestCase):
         return response.data
 
     def logout(self):
-        response = self.client.post(path='/logout/')
+        response = self.client.post(path='/logout')
         self.assertEqual(response.status_code, HTTP_200_OK)
         return response.data

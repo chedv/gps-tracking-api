@@ -17,7 +17,8 @@ class ApiEntryTest(TestCase):
 
     def get(self, device_id, data, expected):
         response = self._get(device_id, data, HTTP_200_OK)
-        self.assertIn(expected, response)
+        self.assertIn('entries', response)
+        self.assertIn(expected, response['entries'])
         return response
 
     def get_by_datetime(self, device_id, str_datetime, expected_list):

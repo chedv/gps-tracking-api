@@ -7,8 +7,6 @@ SECRET_KEY = local_settings.secret_key
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
 INSTALLED_APPS = [
     'api',
     'django.contrib.admin',
@@ -82,15 +80,15 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.MultiPartParser',
+        'api.parsers.NmeaParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
+        'api.renderers.NmeaRenderer',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
