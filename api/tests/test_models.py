@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from api.models import User, Device, Entry
 from api.serializers import DeviceSerializer, EntrySerializer
-from api.utc_datetime import utc_datetime
+from api.datetime_object import get_datetime_object
 
 
 class DeviceModelTest(TestCase):
@@ -52,19 +52,19 @@ class EntryModelTest(TestCase):
             {
                 'latitude': 52.678123,
                 'longitude': 47.563214,
-                'datetime': '12/25/2019 10:00:00',
+                'datetime': '12/25/2019T10:00:00Z',
                 'device': device_id
             },
             {
                 'latitude': 51.678123,
                 'longitude': 47.563214,
-                'datetime': '12/25/2019 10:30:00',
+                'datetime': '12/25/2019T10:30:00Z',
                 'device': device_id
             },
             {
                 'latitude': 55.547825,
                 'longitude': 46.123874,
-                'datetime': '12/25/2019 11:00:00',
+                'datetime': '12/25/2019T11:00:00Z',
                 'device': device_id
             },
         ]
@@ -74,7 +74,7 @@ class EntryModelTest(TestCase):
             serializer.save()
 
     def entry_get(self, entry):
-        row = Entry.objects.get(datetime=utc_datetime(entry['datetime']))
+        row = Entry.objects.get(datetime=get_datetime_object(entry['datetime']))
         self.assertEqual(row.latitude, entry['latitude'])
         self.assertEqual(row.longitude, entry['longitude'])
         self.assertEqual(row.device_id, entry['device'])
@@ -83,7 +83,7 @@ class EntryModelTest(TestCase):
         self.assertEqual(Entry.objects.count(), len(self.entries))
 
     def entry_delete(self, str_datetime):
-        entry = Entry.objects.get(datetime=utc_datetime(str_datetime))
+        entry = Entry.objects.get(datetime=get_datetime_object(str_datetime))
         entry.delete()
 
     def test_basic(self):

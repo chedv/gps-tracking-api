@@ -1,7 +1,7 @@
 from .models import Device, Entry
 from .serializers import DeviceSerializer, EntrySerializer
 
-from api.utc_datetime import utc_datetime
+from .datetime_object import get_datetime_object
 
 
 class Service:
@@ -38,10 +38,9 @@ class EntryService(Service):
         serializer = EntrySerializer(data=entry_data)
         return self.save(serializer)
 
-    def get(self, device_id, str_datetime):
+    def get(self, device_id, datetime_str):
         entries = Entry.objects.filter(device=device_id)
-        if str_datetime is not None:
-            datetime = utc_datetime(str_datetime)
-            entries = entries.filter(device=device_id, datetime__gte=datetime)
+        if datetime_str is not None:
+            entries = entries.filter(device=device_id, datetime__gte=get_datetime_object(datetime_str))
         serializer = EntrySerializer(instance=entries.order_by('datetime'), many=True)
         return serializer.data

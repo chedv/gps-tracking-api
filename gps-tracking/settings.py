@@ -78,7 +78,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
@@ -101,8 +101,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DATETIME_INPUT_FORMATS': ['%m/%d/%Y %H:%M:%S'],
-    'DATETIME_FORMAT': '%m/%d/%Y %H:%M:%S',
+    'DATETIME_INPUT_FORMATS': ['%m/%d/%YT%H:%M:%SZ'],
+    'DATETIME_FORMAT': '%m/%d/%YT%H:%M:%SZ',
 }
 
 AUTH_USER_MODEL = 'api.User'
