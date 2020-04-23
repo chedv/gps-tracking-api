@@ -79,7 +79,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   { 
       "latitude" : xx.xxxxxx, 
       "longitude" : xx.xxxxxx, 
-      "datetime" : "mm/dd/YYYY HH:MM:SS" 
+      "datetime" : "mm/dd/YYYYTHH:MM:SSZ" 
   }
   ```
   
@@ -117,7 +117,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
           { 
               "latitude" : xx.xxxxxx, 
               "longitude" : xx.xxxxxx, 
-              "datetime" : "mm/dd/YYYY HH:MM:SS" 
+              "datetime" : "mm/dd/YYYYTHH:MM:SSZ" 
           }, 
       ]
   }
@@ -133,7 +133,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
           <Placemark>
               <name>Point #1</name>
               <TimeStamp>
-                  <when>mm/dd/YYYY HH:MM:SS</when>
+                  <when>mm/dd/YYYYTHH:MM:SSZ</when>
               </TimeStamp>
               <Point>
                   <coordinates>xx.xxxxxx,xx.xxxxxx</coordinates>
@@ -150,7 +150,7 @@ The project, based on Django Framework and Django Rest Framework, provides API f
   <gpx xmlns="http://www.topografix.com/GPX/1/1">
       <name>entries</name>
       <wpt lat="xx.xxxxxx" lon="xx.xxxxxx">
-          <time>mm/dd/YYYY HH:MM:SS</time>
+          <time>mm/dd/YYYYTHH:MM:SSZ</time>
           <name>Point #1</name>
       </wpt>
   </gpx>
