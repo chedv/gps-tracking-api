@@ -16,6 +16,7 @@ class Entry(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     datetime = models.DateTimeField(db_index=True)
+    satellites = models.PositiveSmallIntegerField(null=True)
     device = models.ForeignKey(to=Device, on_delete=models.CASCADE)
 
     def get_str_date(self):

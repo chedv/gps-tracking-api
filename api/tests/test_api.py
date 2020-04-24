@@ -50,7 +50,8 @@ class ApiTest(TestCase):
             {
                 'latitude': 52.678123,
                 'longitude': 47.563214,
-                'datetime': '12/25/2019T10:00:00Z'
+                'datetime': '12/25/2019T10:00:00Z',
+                'satellites': 4,
             },
             {
                 'latitude': 51.678123,
@@ -65,12 +66,14 @@ class ApiTest(TestCase):
             {
                 'latitude': 53.678123,
                 'longitude': 43.563214,
-                'datetime': '12/26/2019T15:30:00Z'
+                'datetime': '12/26/2019T15:30:00Z',
+                'satellites': 3,
             },
             {
                 'latitude': 52.346774,
                 'longitude': 45.569303,
-                'datetime': '12/26/2019T16:00:00Z'
+                'datetime': '12/26/2019T16:00:00Z',
+                'satellites': 5,
             },
         ]
         data = {}
@@ -185,8 +188,9 @@ class ApiTest(TestCase):
         device_id = 'abcdef123456abcd'
         entries = [
             '$GPRMC,125504.049,A,5542.2389,N,03741.6063,E,0.19,25.82,200919,,,*17',
-            '$GNRMC,033615.00,A,3157.10477,S,11549.42965,E,0.120,,270115,,,A*73',
             '$GPRMC,164125,A,4425.8988,N,07543.5370,W,000.0,000.0,151116,,,A*66',
+            '$GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62',
+            '$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68',
         ]
         for entry in entries:
             self.entry_api.post(device_id, entry, 'nmea')
@@ -197,14 +201,19 @@ class ApiTest(TestCase):
                 'datetime': '09/20/2019T12:55:04Z'
             },
             {
-                'latitude': -31.951746,
-                'longitude': 115.823827,
-                'datetime': '01/27/2015T03:36:15Z'
-            },
-            {
                 'latitude': 44.431647,
                 'longitude': -75.725617,
                 'datetime': '11/15/2016T16:41:25Z'
+            },
+            {
+                'latitude': -37.860833,
+                'longitude': 145.122667,
+                'datetime': '09/13/1998T08:18:36Z'
+            },
+            {
+                'latitude': 49.274167,
+                'longitude': -123.185333,
+                'datetime': '11/19/1994T22:54:46Z'
             },
         ]
         data = {}
@@ -224,4 +233,38 @@ class ApiTest(TestCase):
         for entry in entries:
             args = (device_id, entry, 'nmea')
             self.assertRaises(ValueError, self.entry_api.post, *args)
+        self.user_api.logout()
+
+    def test_invalid_satellites(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = '1234123412341234'
+        invalid_satellites = {
+            'latitude': 55.678123,
+            'longitude': 48.123874,
+            'datetime': '12/25/2019T14:00:00Z',
+            'satellites': 17,
+        }
+        self.entry_api.post_invalid_params(device_id, invalid_satellites)
+        invalid_satellites['satellites'] = 2
+        self.entry_api.post_invalid_params(device_id, invalid_satellites)
+        self.user_api.logout()
+
+    def test_invalid_coordinates(self):
+        self.user_api.register()
+        self.user_api.login()
+        device_id = '1234123412341234'
+        invalid_latitude = {
+            'latitude': 180.000000,
+            'longitude': 48.123874,
+            'datetime': '12/25/2019T14:00:00Z',
+        }
+        self.entry_api.post_invalid_params(device_id, invalid_latitude)
+        invalid_latitude['latitude'] = -180.000000
+        self.entry_api.post_invalid_params(device_id, invalid_latitude)
+        invalid_latitude['latitude'] = 55.678123
+        invalid_latitude['longitude'] = 181.678123
+        self.entry_api.post_invalid_params(device_id, invalid_latitude)
+        invalid_latitude['longitude'] = -181.678123
+        self.entry_api.post_invalid_params(device_id, invalid_latitude)
         self.user_api.logout()

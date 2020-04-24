@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from rest_framework.status import (HTTP_201_CREATED, HTTP_200_OK,
-                                   HTTP_401_UNAUTHORIZED)
+                                   HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND)
 
 
 class ApiEntryTest(TestCase):
@@ -15,7 +15,12 @@ class ApiEntryTest(TestCase):
     def post_unauthorized(self, device_id, data, data_format=None):
         return self._post(device_id, data, data_format, HTTP_401_UNAUTHORIZED)
 
+    def post_invalid_params(self, device_id, data, data_format=None):
+        return self._post(device_id, data, data_format, HTTP_404_NOT_FOUND)
+
     def get(self, device_id, data, expected):
+        if 'satellites' not in expected:
+            expected['satellites'] = None
         response = self._get(device_id, data, HTTP_200_OK)
         self.assertIn('entries', response)
         self.assertIn(expected, response['entries'])

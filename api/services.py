@@ -33,6 +33,7 @@ class EntryService(Service):
             'latitude': data.get('latitude'),
             'longitude': data.get('longitude'),
             'datetime': data.get('datetime'),
+            'satellites': data.get('satellites'),
             'device': device_id
         }
         serializer = EntrySerializer(data=entry_data)
